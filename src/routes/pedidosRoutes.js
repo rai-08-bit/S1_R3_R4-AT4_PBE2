@@ -6,6 +6,7 @@ const pedidoRoutes = Router();
 pedidoRoutes.post('/', pedidoController.criar);
 pedidoRoutes.post('/:id', pedidoController.criarItemPed);
 pedidoRoutes.put('/', pedidoController.atualizarStatus);
+pedidoRoutes.put('/', pedidoController.atualizarItemPed);
 pedidoRoutes.get('/', pedidoController.selecionar);
 pedidoRoutes.delete('/:id', pedidoController.deletar);
 

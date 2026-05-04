@@ -198,12 +198,28 @@ const pedidoRepository = {
         try {
             conn.beginTransaction();
 
-            const sqlItemPed = 'DELETE FROM itens_pedidos WHERE Id=?;';
+            const sqlItemPed = 'SELECT PedidoId FROM itens_pedidos WHERE Id=?;';
             const valuesItemPed = [id];
             const [rowsItemPed] = await conn.execute(sqlItemPed, valuesItemPed);
 
+            const idPed = rowsItemPed[0].PedidoId;
+            
+            const sqlDelItemPed = 'DELETE FROM itens_pedidos WHERE Id=?;';
+            const valuesDelItemPed = [id];
+            const [rowsDelItemPed] = await conn.execute(sqlDelItemPed, valuesDelItemPed);
+
+            const sqlSubTotal = 'SELECT IFNULL(SUM(Quantidade * ValorItem),0) AS NewSubTotal FROM itens_pedidos WHERE PedidoId=?;';
+            const valuesSubTotal = [idPed];
+            const [rowsSubTotal] = await conn.execute(sqlSubTotal, valuesSubTotal);
+
+            const novoSubTotal = rowsSubTotal[0].NewSubTotal ?? 0;
+
+            const sqlNovoSubTotal = 'UPDATE pedidos SET SubTotal=? WHERE Id=?';
+            const valuesNovoSubTotal = [novoSubTotal, idPed];
+            const [rowsNovoSubTotal] = await conn.execute(sqlNovoSubTotal, valuesNovoSubTotal);
+
             conn.commit();
-            return { rowsItemPed };
+            return { rowsItemPed, rowsDelItemPed, rowsNovoSubTotal, rowsSubTotal };
 
         } catch (error) {
 
